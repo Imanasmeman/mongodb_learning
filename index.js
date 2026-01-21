@@ -1,28 +1,21 @@
-// Load environment variables from .env file
-require('dotenv').config();
-const { MongoClient } = require('mongodb');
 
-// Get the connection string from environment variables
-//
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
+const express = require("express")
+const app = express()
+const connectToDatabase = require("./db");
 
-async function connectToDatabase() {
-  try {
-    await client.connect();
-    console.log("Successfully connected to MongoDB Atlas!");
+connectToDatabase()
 
-    // Optional: List databases to verify
-    const dbs = await client.db().admin().listDatabases();
-    console.log("Databases:");
-    dbs.databases.forEach(db => console.log(` - ${db.name}`));
 
-  } catch (error) {
-    console.error("Connection to MongoDB Atlas failed!", error);
-  } finally {
-    await client.close();
-    console.log("Connection closed.");
-  }
-}
+app.use(express.json())
 
-connectToDatabase();
+app.get("/test" , (req,res)=>{
+    try {
+        res.status(200).json({message:"this is test route"})
+    } catch (error) {
+        res.status(500).json({message:"somthing wrong"})
+    }
+})
+
+app.listen(8000,()=>{
+    console.log("server started")
+})
